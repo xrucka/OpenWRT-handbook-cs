@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage[czech]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{microtype}
+\usepackage{hyphenat}
+\usepackage{graphicx}
+%\usepackage[toc]{glossaries}
+\usepackage{subfigure}
+\usepackage{hyperref}
+\hypersetup{
+    plainpages=false,
+    pdfpagelabels,
+    bookmarks=true,
+    unicode=true,
+    pdftoolbar=true,
+    pdfmenubar=true,
+    % nezapomen aktualizovat odpovidajici klicova slova nize
+    colorlinks=true,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\usepackage{glossaries}
+
+\definecolor{Orange}{rgb}{1,0.5,0}
+\newcommand{\todo}[1]{\textcolor{Orange}{[[TODO: #1]]}}
+\definecolor{Red}{rgb}{1,0,0}
+\newcommand{\verify}[1]{\textcolor{Red}{[[Verify: #1]]}}
+\definecolor{Green}{rgb}{0,1,0}
+\newcommand{\comment}[1]{\textcolor{Green}{[COMMENT: #1]}}
+
+\title{Zjednodušený základní návod k~OpenWRT pro TP-Link TD-W8970B}
+
+\input{zkratky}
+\makeglossaries
+
+\begin{document}
+\input{predmluva}
+\input{nastaveni}
+\input{wifi}
+\input{vdsl}
+\input{sit}
+\input{switch}
+\input{extroot}
+\input{software}
+\end{document}

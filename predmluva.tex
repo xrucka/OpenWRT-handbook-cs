@@ -1,0 +1,55 @@
+\section{Předmluva}
+Zdravím, tento neoficiální návod k \gls{openwrt} vznikl primárně proto,
+aby novým uživatelům pomohl si zvyknout na trochu jiný firmware, než běžně
+potkají. Neklade si za cíl povysvětlovat ani naučit vše, ale snad bude
+stačit k většině běžných úkonů.
+
+\subsection{Co to je \gls{openwrt}?}
+\gls{openwrt} je alternativní firmware pro síťový hardware, založený na
+operačním systému Linux. Pokud Linux neznáte a slyšeli jste o něm jen
+zkazky, že jde o nějakou zastaralou hrůzu, připomínající největší temnoty
+systému MS DOS, pak jim nevěřte. I když to není na první pohled znát, i
+takový Android je jen sadou aplikací, spuštěných v Linuxu. Protože -- stejně
+stejně jako Linux -- je bezplatně spoluvyvíjen komunitou uživatelů a programátorů,
+je množství podporovaných zařízení poněkud omezeno. Naštěstí ale máte jedno
+ze zařízení, která podporována jsou.
+
+\subsection{Ovládání}
+Co tedy potřebujete vědět o ovládání svého routeru?
+\begin{description}
+\item{\textbf{Webové rozhraní}}
+Webové rozhraní dodávané s \gls{openwrt} se jmenuje \acrshort{luci}
+(\acrlong{luci}). Je naprogramováno v jazyce Lua a existuje pro něj řada
+rozšiřujících aplikací. Protože je ale \gls{openwrt} čistokrevný Linux
+-- a tedy na něm lze provozovat prakticky jakoukoliv Linuxovou aplikaci --
+je také současně nemožné naprogramovat webové rozhraní pro každou aplikaci.
+\item{\textbf{Terminálové rozhraní}}
+Síla (a pro nové uživatele také slabina) ovládání Linuxu spočívá v příkazové
+řádce. Na tu se lze připojit pomocí zabezpečené služby \gls{ssh}. Ta probíhá
+po šifrovaném komunikačním kanálu, což je jeden ze základních stavebních
+kamenů bezpečnosti Vašeho routeru. Protože ale ssh potřebuje pro své fungování
+krom uživatelského jména i heslo, není zprvu možné ssh použít. Pro nastavení
+hesla tedy použijte webové rozhraní. Pro
+\end{description}
+
+\section{První připojení}
+Než začnete se zběsilým připojováním routeru k síti, pročtěte si prosím tyto
+instrukce. Váš router je po instalaci firmware nastaven tak, aby používal IPv4 adresu
+192.168.1.1. Propojte jej tedy síťovým kabelem se svým počítačem a ve webovém
+prohlížeči otevřete adresu 192.168.1.1. Klikněte na tlačítko \uv{login} a
+přihlašte se.
+
+Po přihlášení Vás uvítá přehledová obrazovka, na které najdete souhrné informace
+o Vašem zařízení. Na horní liště najdete nabídku \uv{System}, ve které rozklepněte
+položku \uv{Administration}. Tím se dostanete na stránku, kde je možné nastavit
+heslo pro správu routeru. Heslo se v žádném případě nevyplatí nechat nenastavené,
+avšak pozor - v případě že heslo zapomenete, nebude jednoduché se do routeru
+opět dostat. Zvolené heslo si někam pro jistotu poznamenejte a schovejte.
+Namísto krkolomných hesel můžete použít jednoduchou větu (nejlépe bez háčků
+a čárek), kterou si ovšem snadno zapamatujete.
+
+\input{firstboot-vdsl}
+
+\todo{Extroot s prvním připojením}
+\todo{Failsafe}
+
