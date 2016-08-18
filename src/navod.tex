@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{scrartcl}
 \usepackage[czech]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{color}
@@ -22,7 +22,7 @@
     linkcolor=black,
     urlcolor=black
 }
-\usepackage{glossaries}
+\usepackage[nonumberlist]{glossaries}
 
 \definecolor{Orange}{rgb}{1,0.5,0}
 \newcommand{\todo}[1]{\textcolor{Orange}{[[TODO: #1]]}}
@@ -31,18 +31,25 @@
 \definecolor{Green}{rgb}{0,1,0}
 \newcommand{\comment}[1]{\textcolor{Green}{[COMMENT: #1]}}
 
-\title{Zjednodušený základní návod k~OpenWRT pro TP-Link TD-W8970B}
+\newcommand{\wrtversion}[0]{15.05.1}
+
+\title{Zjednodušený základní návod k~OpenWRT}
+\subtitle{pro TP-Link TD-W8970B rev. 1.0}
+\author{Lukáš Ručka}
+\date{\today}
+
+\renewcommand{\glossarysection}[2][]{}
 
 \input{zkratky}
 \makeglossaries
 
 \begin{document}
+\maketitle
 \input{predmluva}
+\input{firstboot}
 \input{nastaveni}
-\input{wifi}
-\input{vdsl}
 \input{sit}
-\input{switch}
 \input{extroot}
 \input{software}
+\input{o2}
 \end{document}

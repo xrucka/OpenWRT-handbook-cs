@@ -6,7 +6,7 @@ PDFLATEX = pdflatex
 #BIBTEX = bibtex
 VIEW = atril
 #INDEX = csindex
-#GLOSSARIES = makeglossaries
+GLOSSARIES = makeglossaries
 VLNA = vlna
 DESTDIR ?= ..
 

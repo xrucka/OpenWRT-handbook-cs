@@ -1,0 +1,23 @@
+\section{Nastavení specifická pro 02}
+\subsection{VDSL}
+O2 používá pro svou síť jednotné přihlašovací údaje -- protokol \uv{pppoe},
+uživatel \uv{o2}, heslo \uv{o2}. \gls{vdsl} rozhraní pak odpovídající ptm
+(pokud nemá router více modemů zpravidla \uv{ptm0}), VLAN ID 848 (\uv{ptm0.848}).
+Protokol získání IPv4 adresy DHCP. IPv6 pak skrze rozhraní wan6 svázané s \uv{@wan},
+protokol DHCPv6.
+
+Pro IPTV je pak potřeba použít bridge, do kterého jsou připojeny porty k
+settopboxům a vdsl rozhraní \uv{ptm0.835}.
+
+\subsection{Firewall}
+\todo{dhcpv6, iptv}
+
+\subsection{Systém}
+Pro správnou funkci je potřeba zakázat IGMP snooping při startu routeru. Toho
+docílíte následujícím řádkem, umístěným do souboru \uv{/etc/rc.local}: \uv{echo "0" > /sys/devices/virtual/net/br-IPTV/bridge/multicast\_snooping}
+\todo{listings}
+
+\subsection{Úryvky konfiguračních souborů}
+\todo{rc.local}
+\todo{config/network}
+\todo{config/firewall}
