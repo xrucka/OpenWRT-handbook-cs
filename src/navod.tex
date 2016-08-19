@@ -4,6 +4,7 @@
 \usepackage{color}
 \usepackage{microtype}
 \usepackage{hyphenat}
+\usepackage{listings}
 \usepackage{graphicx}
 %\usepackage[toc]{glossaries}
 \usepackage{subfigure}
@@ -31,7 +32,30 @@
 \definecolor{Green}{rgb}{0,1,0}
 \newcommand{\comment}[1]{\textcolor{Green}{[COMMENT: #1]}}
 
+\definecolor{listingsBackground}{rgb}{0.99,0.99,0.99}
+
 \newcommand{\wrtversion}[0]{15.05.1}
+
+\lstset{backgroundcolor=\color{listingsBackground}}
+  \lstset{
+      inputencoding=utf8,
+      %extendedchars=trze,
+      backgroundcolor=\color{listingsBackground},
+      %frame=trbl,
+      %frameround=simple,
+      %basicstyle=\ttfamily,
+      %framerule=0pt,
+      %basicstyle=\ttfamily,
+      %breaklines=true,
+      %breakatwhitespace=true,
+      %escapeinside={\*}{*)},
+      %basicstyle=\footnotesize,
+      %texcl=false,
+      %literate=
+      %{í}{{\'{i}}}1
+      %{á}{{\'{a}}}1
+      %{ř}{{\v{r}}}1
+   }
 
 \title{Zjednodušený základní návod k~OpenWRT}
 \subtitle{pro TP-Link TD-W8970B rev. 1.0}

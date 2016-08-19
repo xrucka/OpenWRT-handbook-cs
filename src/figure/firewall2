@@ -1,0 +1,43 @@
+# pseudoduplicitni s Allow-ICMPv6-Input, radeji nepouzivat
+config rule
+	option family 'ipv6'
+	option proto 'icmp'
+	option src_ip 'fe80::/10'
+	option dest_ip 'fe80::/10'
+	option src '*'
+	option target 'ACCEPT'
+	option name 'link-local ICMPv6'
+
+# pseudoduplicitni s Allow-DHCPv6, radeji nepouzivat
+config rule
+	option proto 'udp'
+	option src_port '547'
+	option dest_port '546'
+	option family 'ipv6'
+	option target 'ACCEPT'
+	option src '*'
+	option src_ip 'fe80::/10'
+	option dest_ip 'fe80::/10'
+	option name 'link-local DHCPv6'
+
+# explicitni deny pro cokoliv co by z iptv chtelo
+# prolezt do wan (duplicitni proti obecnemu pravidlu)
+config rule
+	option src 'iptv'
+	option dest 'lan'
+	option name 'IPTV -> lan deny'
+	option target 'DROP'
+
+config rule
+	option src 'iptv'
+	option name 'IPTV -> device deny'
+	option target 'DROP'
+
+# veskery provoz skrze bridge povolen
+config rule
+	option target 'ACCEPT'
+	option src 'iptv'
+	option dest 'iptv'
+	option name 'multicast'
+	option proto 'all'
+

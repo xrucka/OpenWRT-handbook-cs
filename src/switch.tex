@@ -16,7 +16,8 @@ paket samotný značka s číslem, do které \gls{vlan} paket patří. Příjemc
 pak musí mít pro stejnou \gls{vlan} nastavenu stejnou síť. Protože ne vždy
 je toto značkování (angl. tagged) žádoucí, je možné použít neznačkovaný režim
 portu. To znamená, že při vysílání ven je značka odstraněna a naopak při
-přijetí je značka doplněna (angl. untagged).
+přijetí je značka doplněna (angl. untagged). Port může být veden jako neznačkovaný
+pro nejvýše jednu VLAN.
 
 Toto umožňuje realizovat jak WAN, tak LAN rozhraní jedním switchem. Logické
 \gls{wan} rozhraní je tvořeno jednou \gls{vlan} (např. VLAN ID 2), kdežto
@@ -48,5 +49,3 @@ Se změnami VLAN buďte opatrní, zvláště pokud zasahujete do připojení k p
 V takovém případě doporučuji jednak použít externí úložiště, druhak nastavit
 vše najednou pomocí příkazové řádky (nejlépe textovým editorem), vše si po sobě
 několikrát opakovaně přečíst a teprve posléze nastavení aplikovat restartem.
-
-\todo{Na konec přidej sekci nastavení specifických pro O2}
