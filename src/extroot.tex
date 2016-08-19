@@ -1,1 +1,54 @@
-\section{Zvětšení kapacity disku (extroot)}
+\section{Systém na externím úložišti (extroot)}
+\subsection{Vytvoření externího úložiště}
+\todo{Rozepsat - partice, souborový systém, vysvětlit UUID}
+
+\subsection{Import zálohy externího úložiště}
+Obnovení zálohy externího úložiště lze provést pomocí několika jednoduchých
+kroků.
+\begin{enumerate}
+\item Existující obraz zapište na flashdisk, který hodláte používat.
+Pokud používáte Windows, budete k tomu potřebovat program Win32 Disk
+Imager\footnote{\url{https://sourceforge.net/projects/win32diskimager/}}.
+Je možné že tento nástroj bude potřeba spustit s oprávněními správce
+(shift + pravé tlačítko myši). Vyberte soubor s obrazem (přípona \uv{.img})
+a cílové zařízení. Tlačítkem \uv{Write} pak obraz zapíšete na disk. Pokud
+používáte Linux je celá věc mnohem jednodušší, všechny potřebné nástroje
+pro zápis již máte v systému. Vše co potřebujete znát je pouze uzel zařízení,
+na které budete zapisovat.
+\begin{lstlisting}[language=sh]
+linux@localhost:/tmp> dmesg | tail | grep Attached # zjistim jmeno uzlu
+[167819.765155] sd 7:0:0:0: Attached scsi generic sg4 type 0
+[167819.774927] sd 7:0:0:0: [sde] Attached SCSI removable disk
+linux@localhost:/tmp> # jmeno uzlu je u mne sde, cesta k zarizeni tedy /dev/sde
+linux@localhost:/tmp> # odpojim existujici souborove systemy
+linux@localhost:/tmp> sudo umount /dev/sde*
+linux@localhost:/tmp> sudo dd if=OpenWRT-extroot.img of=/dev/sde bs=4K
+49408+0 records in
+49408+0 records out
+202375168 bytes (202 MB, 193 MiB) copied, 40.9951 s, 4.9 MB/s
+\end{lstlisting}
+\item Pro optimální využití kapacity disku je vhodné existující diskové
+oddíly zvětšit. Pokud má Váš disk odkládací oddíl (swap), je vhodné jej
+nastavit na přibližně dvojnásobek kapacity RAM routeru. Systémový oddíl
+můžete nechat vyplnit zbytek volného místa, či jej jen zvětšit a přidat
+oddíl pro sdílená data. Takto manipulovat s místem na disku můžete například
+pomocí programu GParted\footnote{\url{https://sourceforge.net/projects/gparted/},
+Dodáván i formou bootovatelného obrazu.}.
+\end{enumerate}
+
+Připojte flashdisk do routeru a přihlaste se na něj. Zkontrolujte, že se
+obsah souboru \uv{/etc/config/fstab} odkazuje na správný oddíl na flashdisku.
+V případě, že používáte připojení disku pomocí \gls{uuid} můžete identifikátor
+oddílu ověřit příkazem:
+\begin{lstlisting}[language=sh]
+blkid /dev/sda2 # jako systemovy slouzi 2. oddil flashdisku
+\end{lstlisting}
+Pokud chcete namísto \gls{uuid} použít cestu k zařízení, použijte klíč
+\uv{device} s cestou k zařízení. Po nastavení stačí restartovat router a
+ověřit že je \uv{/overlay} připojeno z flashdisku. Kompletní návod lze
+nalézt na wiki \gls{openwrt}\footnote{\url{https://wiki.openwrt.org/doc/howto/extroot}}.
+\begin{lstlisting}[language=sh]
+root@openwrt:/sys/class/block# grep overlay /proc/mounts
+/dev/sda2 /overlay ext2 rw,relatime 0 0
+overlayfs:/overlay / overlay rw,noatime,lowerdir=/,upperdir=/overlay/upper,workdir=/overlay/work 0 0
+\end{lstlisting}
