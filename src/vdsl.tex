@@ -1,2 +1,52 @@
 \subsection{VDSL}
 \label{net:vdsl}
+Router TP-Link TD-W8970B je osazen i DSL modemem\footnote{
+Konkrétně se jedná o Lantiq\footnote{Značka Lantiq dnes vystupuje jako součást značky Intel.}
+XWAY \todo{doplň SOC}.} podporujícím jak \gls{adsl} 2+,
+tak \gls{vdsl} 1/2. Na rozdíl od DSL routerů s \gls{soc} značky Broadcom
+pro tento existují ovladače kompatibilní s \gls{openwrt} a tedy je možné tento
+router použivat i pro DSL připojení. Pro zprovoznění DSL subsystému je potřeba
+nainstalovat balíček \uv{ltq-vdsl-app} a stáhnout licenčně omezený binární
+firmware modemu (procedura instalace binárního firmware blíže popsána v
+sekci \ref{firstboot:vdsl})
+
+Nastavení fyzické vrstvy modemu pak lze najít v souboru \uv{/etc/config/network}.
+Pro toto nastavení slouží sekce typu vdsl. Příklad nastavení modemu pomocí
+nástroje uci lze najít v ilustraci \ref{net:vdsl:phy}. Sekce obnáší následující
+klíče:
+\begin{description}
+\item[annex] Jednoznakové označení DSL annexu, který se pro komunikaci má
+použít (malým písmenem). Jednotlivé annexy jsou historicky-územně vymezeny
+(důsledek technologií dříve používaných pro realizaci telefonní sítě). V
+české republice se již dnes annex A nepoužívá a soudobá infrastruktura je
+založena na annexu B.
+\item[firmware] Cesta k souboru s binárním frmware pro modem. Pokud nemáte
+závažný důvod směrovat ji jinam, měla by obnášet \uv{/lib/firmware/vdsl.bin}.
+\item[tone] \todo{rozepiš tón}. Mezi možné \todo{tóniny} patří \uv{a}, \uv{v}, \uv{x}; přičemž
+k \todo{tóninám} \uv{a} a \uv{b} lze připojit znak \uv{v}, značící vektorizaci.
+Vektorizace je formou kompenzace přeslechů mezi páry telefonních vodičů,
+která je na \gls{dslam}u. Mimo jiné tvoří nedílnou součást VDSL2.
+\item[xfer\_mode] Režim přenosu dat. Pro starší technologie (ADSL) bylo
+používáno \uv{atm} (asynchronní přenosový mód), kdežto VDSL se opírá o \uv{ptm}
+(paketový režim přenosu).
+\end{description}
+\begin{figure}
+\begin{lstlisting}
+uci set network.dsl.annex=b
+uci set network.dsl.firmware=/lib/firmware/vdsl.bin
+uci set network.dsl.tone=bv
+uci set network.dsl.xfer_mode=ptm
+uci commit network
+\end{lstlisting}
+\caption{Nastavení fyzické vrstvy \gls{vdsl} modemu pomocí uci}
+\label{net:vdsl:phy}
+\end{figure}
+
+Samotné fyzické nastavení ale nepostačuje, je potřeba ještě nastavit přihlašovací
+údaje. Tyto se nastavují pomocí odpovídajícího virtuálního rozhraní (zpravidla
+pojmenovaného \uv{wan}). Toto rozhraní pak musí mít za fyzické rozhranní zvoleno
+zařízení modemu (typicky \uv{ptm0}) s identifikátorem VLAN dle instrukcí poskytovatele
+připojení (obdoba VPI/VCI u \gls{adsl}). Příkladem budiž jméno rozhraní
+\uv{ptm0.848}. Toto rozhraní takřeka jistě nebude v nabídce, tudíž je potřeba
+při jeho zadávání ve webovém rozhraní použít textové pole. Ukázku nastavení
+pro síť O2 lze najít v sekci \ref{o2:frag:network}.
