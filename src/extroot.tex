@@ -1,8 +1,201 @@
 \section{Systém na externím úložišti (extroot)}
-\subsection{Vytvoření externího úložiště}
-\todo{Rozepsat - partice, souborový systém, vysvětlit UUID}
+\label{extroot}
+Externím úložištěm je zparvidla\footnote{Slovo zpravidla zde stojí oprávněně.
+Kupříkladu pro TP-Link LT-MR3220 existuje pěkný návod, jak na nevyužité \gls{gpio}
+piny připojit SD kartu (\url{https://wiki.openwrt.org/toh/tp-link/tl-mr3420/deep.mmc.hack}).}
+flashdisk, sdkarta či jiné paměťové zařízení, připojené přes USB.
 
-\subsection{Import zálohy externího úložiště}
+\subsection{Odpojení stávajících souborových stystémů}
+\label{extroot:umount}
+Než budete pokračovat, musíte zjistit uzel zařízení flashdisku a odpojit
+stávající souborové systémy na něm.
+\begin{lstlisting}[language=sh]
+linux@localhost:/tmp> dmesg | tail | grep Attached # zjistim jmeno uzlu
+[167819.765155] sd 7:0:0:0: Attached scsi generic sg4 type 0
+[167819.774927] sd 7:0:0:0: [sde] Attached SCSI removable disk
+linux@localhost:/tmp> # jmeno uzlu je u mne sde, cesta k zarizeni tedy /dev/sde
+linux@localhost:/tmp> # odpojim existujici souborove systemy
+linux@localhost:/tmp> sudo umount /dev/sde*
+\end{lstlisting}
+
+\subsection{Formátování disku}
+Předpokládejme tedy použití flashdisku. Ke zprovoznění USB portu je potřeba
+zpravidla balíček {\texttt kmod-usb-storage} a ovladač sběrnice USB (zpravidla
+{\texttt kmod-usb2} pro routery osazené porty USB 2.0). Dále je zapotřebí
+ovladač zvoleného souborového systému (například {\texttt kmod-fs-ext4}).
+Posledními potřebnými balíčky jsou {\texttt block-mount} a {\texttt swap-utils}.
+
+Následující část předpokládá práci s Linuxem, ať už na jiném počítači, nebo
+na routeru jako takovém (v takovém případě budete potřebovat i balíčky
+{\texttt e2fsprogs fdisk}).
+
+Flashdisk připojte ke zvolenému Linuxu a rozdělte na dva oddíly - první, menší,
+bude sloužit jako swap (oddíl, kam se dočasně odkládají nevyužité paměťové
+bloky z RAM), druhý jako samotný extroot. Pro menší oddíl bude postačovat
+pár MiB (např. 64 MiB), router jej za nomrálních okolností nebude využívat.
+ID typu oddílu nastavte na 82 (Linux swap). Druhý oddíl pak zabere zbytek
+disku.
+
+Nejprve tedy spustíme program fdisk a na flashdisku vytvoříme prázdnou tabulku
+rozložení disku:
+\begin{verbatim}
+linux@localhost:/tmp> sudo fdisk /dev/sde
+
+Vítejte v fdisku (util-linux 2.28.2).
+Změny zůstanou pouze v paměti, dokud se nerozhodnete je uložit na disk.
+Při použití příkazu zápisu buďte obezřetní.
+
+Příkaz (m pro nápovědu): o
+Vytvořena nová dosová tabulka rozdělení disku s identifikátorem 0x9b990a7e.
+\end{verbatim}
+
+Následně připravíme první oddíl:
+\begin{verbatim}
+Příkaz (m pro nápovědu): n
+Typ oddílu
+   p   primární (0 primární, 0 rozšířený, 4 volný)
+   e   rozšířený (kontejner pro logické oddíly)
+Vyberte (výchozí p): p
+Číslo oddílu (1-4, výchozí je 1):
+První sektor (2048-1965055, výchozí je 2048):
+Poslední sektor, +sektorů nebo +velikost{K,M,G,T,P}
+	(2048-1965055, výchozí je 1965055): +64M
+
+Vytvořen nový oddíl 1 typu "Linux" o velikosti 64 MiB.
+
+Příkaz (m pro nápovědu): t
+Vybrán oddíl 1
+Typ oddílu (L vypíše všechny typy): 82
+Typ oddílu "Linux" byl změněn na "Linux swap / Solaris".
+\end{verbatim}
+
+Nyní druhý oddíl:
+\begin{verbatim}
+Příkaz (m pro nápovědu): n
+Typ oddílu
+   p   primární (1 primární, 0 rozšířený, 3 volný)
+   e   rozšířený (kontejner pro logické oddíly)
+Vyberte (výchozí p):
+
+Použije se výchozí odpověď p.
+Číslo oddílu (2-4, výchozí je 2):
+První sektor (133120-1965055, výchozí je 133120):
+Poslední sektor, +sektorů nebo +velikost{K,M,G,T,P}
+	(133120-1965055, výchozí je 1965055):
+
+Vytvořen nový oddíl 2 typu "Linux" o velikosti 894,5 MiB.
+\end{verbatim}
+
+Nakonec zkontrolujeme výsledek a zapíšeme tabulku rozložení disku:
+\begin{verbatim}
+Příkaz (m pro nápovědu): p
+Disk /dev/sde: 959,5 MiB, 1 006 108 672 bajtů, 1 965 056 sektorů
+Jednotky: sektorů po 1 * 512 = 512 bajtech
+Velikost sektoru (logického/fyzického): 512 bajtů / 512 bajtů
+Velikost I/O (minimální/optimální): 512 bajtů / 512 bajtů
+Typ popisu disku: dos
+Identifikátor disku: 0x9b990a7e
+
+Zařízení   Zaveditelný Začátek   Konec Sektory Velikost ID Druh
+/dev/sde1                 2048  133119  131072      64M 82 Linux swap/Solaris
+/dev/sde2               133120 1965055 1831936   894,5M 83 Linux
+
+Příkaz (m pro nápovědu): w
+Tabulka rozdělení disku byla změněna.
+Volám ioctl() pro znovunačtení tabulky rozdělení disku.
+Synchronizují se disky.
+\end{verbatim}
+
+Nově vzniklé oddíly je potřeba inicializovat odpovídajícím souborovým systémem.
+Souborový systém extrootu je navíc vhodné pojmenovat, aby nedošlo k náhodnému
+přemazání dat potomkem, který hledá flashdisk na svůj powerpoint do školy.
+Pokud máte routerů více, je dobré poznačit si do jmenovky, ke kterému routeru
+tento disk patří. \gls{uuid} nově vzniklých souborových systémů si poznačte,
+budete je potřebovat.
+\begin{verbatim}
+linux@localhost:/tmp> sudo mkswap /dev/sde1
+mkswap: /dev/sde1: pozor: odstraňuje se starý vzorec ext4.
+Vytváří se odkládací prostor verze 1, velikost = 64 MiB (67104768 bajtů)
+žádná jmenovka, UUID=24623eae-5c3c-4454-86d4-f483a360e39d
+
+linux@localhost:/tmp> sudo mkfs.ext3 -L "openwrt-w8970b/" /dev/sde2
+mke2fs 1.43.1 (08-Jun-2016)
+/dev/sde2 obsahuje systém souborů ext2 se jmenovkou "ap-extroot""
+	naposledy připojeno do /tmp/extroot/overlay v Mon Jan 11 10:38:27 2016
+Přesto pokračovat? (a,n) a
+Vytváří se systém souborů s 228992 (4k) bloky a 57344 uzly
+UUID systému souborů=4a12f341-0046-4aab-aa47-d3baafed85cf
+Zálohy superbloku uloženy v blocích:
+	32768, 98304, 163840
+
+Alokují se tabulky skupin: hotovo
+Zapisuji tabulky iuzlů: hotovo
+Vytváří se žurnál (4096 bloků): hotovo
+Zapisuji superbloky a účtovací informace systému souborů: hotovo
+\end{verbatim}
+
+\subsection{Příprava na straně OpenWRT}
+Připravte si kostru souboru {\texttt /etc/config/fstab}. Tento bude obnášet
+jednak obecná nastavení, druhak údaje k připojení disků. Z předchozí sekce
+máte poznačená UUID, která budete nyní potřebovat. Pokud jste si UUID
+nepoznačili, můžete použít nástroj blkid:
+
+\begin{verbatim}
+linux@localhost:/tmp> blkid /dev/sde1
+/dev/sdd1: UUID="24623eae-5c3c-4454-86d4-f483a360e39d" TYPE="swap" PARTUUID="9b990a7e-01"
+
+linux@localhost:/tmp> blkid /dev/sdd2
+/dev/sdd2: UUID="4a12f341-0046-4aab-aa47-d3baafed85cf" SEC_TYPE="ext2" TYPE="ext3" PARTUUID="9b990a7e-02"
+\end{verbatim}
+
+Nyní tedy upravme soubor \uv{/etc/config/fstab} tak, aby obsahoval nastavení
+uvedená v ilustraci \ref{extroot:fstab}. Nezapomeňte použít \gls{uuid}, která
+odpovídají Vašim oddílům.
+\begin{figure}
+	\lstinputlisting{figure/fstab}
+	\caption{Soubor \uv{/etc/config/fstab}}
+	\label{extroot:fstab}
+\end{figure}
+
+Nyní odpojte flashdisk od stroje, ve kterém jste jej připravovali, a připojte
+jej k routeru. Pokud vše funguje správně, měli byste v \uv{/dev} najít uzuly
+zařízení.
+\begin{verbatim}
+root@openwrt:~> ls /dev | grep sd
+sda
+sda1
+sda2
+\end{verbatim}
+
+Oddíl extrootu je potřeba připojit a překopírovat na něj obsah adresáře \uv{/overlay}.
+\begin{verbatim}
+root@openwrt:~> mount /dev/sda2 /tmp/overlay
+root@openwrt:~> tar -C /overlay -c . -f - | tar -C /tmp/overlay -xf -
+\end{verbatim}
+
+Abychom měli jistotu, že je systém spuštěn z flashdisku, provedeme drobnou
+úpravu v souboru \uv{/tmp/overlay/upper/etc/banner}.
+\begin{verbatim}
+root@openwrt:~> cp /etc/banner /tmp/overlay/upper/etc/banner
+root@openwrt:~> echo "extroot online!" >> /tmp/overlay/upper/etc/banner
+\end{verbatim}
+
+A to je vše, nyní stačí router restartovat. Po restartu a následném přihlášení
+byste měli na konci uvítacího výpisu vidět právě zprávu \uv{extroot online!}.
+Pokud ji nevidíte, někde nejspíše došlo k chybě, nejspíše není správně zadáno
+\gls{uuid}, nebo nejsou k dispozici uzly zařízení v \uv{/dev}. Oprava už bude
+na Vás.
+
+\subsection{Poznámka k (včasnému) použití extrootu}
+Jak jsem již popsal v sekci \ref{firstboot:extroot}, vytvoření extrootu jako
+jedné z prvních věcí (ještě dříve než nastvím heslo), může jednomu zachránit
+spoustu času a úsilí. Správně zabezpečený router je věcí klíčovou pro bezproblémové
+fungování sítě. Jste si jisit, že si (doufám že silné) heslo, které pro svůj
+router používáte budete pamatovat i za 5 let? Ani sebelepší systém nebude
+nikdy dost bezpečný, pokud jeho správce použije heslo, které si sice pamatuje,
+ale které je dost slabé aby ho rozlouskl puberťák se základy programování.
+
+\subsection{Import zálohy externího úložiště z obrazu disku}
 Obnovení zálohy externího úložiště lze provést pomocí několika jednoduchých
 kroků.
 \begin{enumerate}
@@ -13,20 +206,14 @@ Je možné že tento nástroj bude potřeba spustit s oprávněními správce
 (shift + pravé tlačítko myši). Vyberte soubor s obrazem (přípona \uv{.img})
 a cílové zařízení. Tlačítkem \uv{Write} pak obraz zapíšete na disk. Pokud
 používáte Linux je celá věc mnohem jednodušší, všechny potřebné nástroje
-pro zápis již máte v systému. Vše co potřebujete znát je pouze uzel zařízení,
-na které budete zapisovat.
-\begin{lstlisting}[language=sh]
-linux@localhost:/tmp> dmesg | tail | grep Attached # zjistim jmeno uzlu
-[167819.765155] sd 7:0:0:0: Attached scsi generic sg4 type 0
-[167819.774927] sd 7:0:0:0: [sde] Attached SCSI removable disk
-linux@localhost:/tmp> # jmeno uzlu je u mne sde, cesta k zarizeni tedy /dev/sde
-linux@localhost:/tmp> # odpojim existujici souborove systemy
-linux@localhost:/tmp> sudo umount /dev/sde*
+pro zápis již máte v systému. Proveďte tedy přípravu podle \ref{extroot:umount}
+a pokračujte níže uvedeným příkazem.
+\begin{verbatim}
 linux@localhost:/tmp> sudo dd if=OpenWRT-extroot.img of=/dev/sde bs=4K
 49408+0 records in
 49408+0 records out
 202375168 bytes (202 MB, 193 MiB) copied, 40.9951 s, 4.9 MB/s
-\end{lstlisting}
+\end{verbatim}
 \item Pro optimální využití kapacity disku je vhodné existující diskové
 oddíly zvětšit. Pokud má Váš disk odkládací oddíl (swap), je vhodné jej
 nastavit na přibližně dvojnásobek kapacity RAM routeru. Systémový oddíl
@@ -40,15 +227,15 @@ Připojte flashdisk do routeru a přihlaste se na něj. Zkontrolujte, že se
 obsah souboru \uv{/etc/config/fstab} odkazuje na správný oddíl na flashdisku.
 V případě, že používáte připojení disku pomocí \gls{uuid} můžete identifikátor
 oddílu ověřit příkazem:
-\begin{lstlisting}[language=sh]
+\begin{verbatim}
 blkid /dev/sda2 # jako systemovy slouzi 2. oddil flashdisku
-\end{lstlisting}
+\end{verbatim}
 Pokud chcete namísto \gls{uuid} použít cestu k zařízení, použijte klíč
 \uv{device} s cestou k zařízení. Po nastavení stačí restartovat router a
 ověřit že je \uv{/overlay} připojeno z flashdisku. Kompletní návod lze
 nalézt na wiki \gls{openwrt}\footnote{\url{https://wiki.openwrt.org/doc/howto/extroot}}.
-\begin{lstlisting}[language=sh]
+\begin{verbatim}
 root@openwrt:/sys/class/block# grep overlay /proc/mounts
 /dev/sda2 /overlay ext2 rw,relatime 0 0
 overlayfs:/overlay / overlay rw,noatime,lowerdir=/,upperdir=/overlay/upper,workdir=/overlay/work 0 0
-\end{lstlisting}
+\end{verbatim}

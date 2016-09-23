@@ -2,7 +2,7 @@
 \label{net:vdsl}
 Router TP-Link TD-W8970B je osazen i DSL modemem\footnote{
 Konkrétně se jedná o Lantiq\footnote{Značka Lantiq dnes vystupuje jako součást značky Intel.}
-XWAY \todo{doplň SOC}.} podporujícím jak \gls{adsl} 2+,
+XWay VRX268 @500MHz.} podporujícím jak \gls{adsl} 2+,
 tak \gls{vdsl} 1/2. Na rozdíl od DSL routerů s \gls{soc} značky Broadcom
 pro tento existují ovladače kompatibilní s \gls{openwrt} a tedy je možné tento
 router použivat i pro DSL připojení. Pro zprovoznění DSL subsystému je potřeba
@@ -22,10 +22,11 @@ použít (malým písmenem). Jednotlivé annexy jsou historicky-územně vymezen
 založena na annexu B.
 \item[firmware] Cesta k souboru s binárním frmware pro modem. Pokud nemáte
 závažný důvod směrovat ji jinam, měla by obnášet \uv{/lib/firmware/vdsl.bin}.
-\item[tone] \todo{rozepiš tón}. Mezi možné \todo{tóniny} patří \uv{a}, \uv{v}, \uv{x}; přičemž
-k \todo{tóninám} \uv{a} a \uv{b} lze připojit znak \uv{v}, značící vektorizaci.
+\item[tone] Vybírá sadu tónů, použitou pro navázání komunikace. Mezi možné
+sady patří \uv{a}, \uv{b}, \uv{x}; přičemž
+k sadám \uv{a} a \uv{b} lze připojit znak \uv{v}, značící vektorizaci.
 Vektorizace je formou kompenzace přeslechů mezi páry telefonních vodičů,
-která je na \gls{dslam}u. Mimo jiné tvoří nedílnou součást VDSL2.
+která se musí předpočítat na \gls{dslam}u. Mimo jiné tvoří nedílnou součást VDSL2.
 \item[xfer\_mode] Režim přenosu dat. Pro starší technologie (ADSL) bylo
 používáno \uv{atm} (asynchronní přenosový mód), kdežto VDSL se opírá o \uv{ptm}
 (paketový režim přenosu).
