@@ -1,6 +1,6 @@
 \subsection{Firmware VDSL}
 \label{firstboot:vdslfw}
-Po nastavení hesla můžete pokračovat zprovozněním VDSL.
+Nyní tedy ke zprovoznění samotného VDSL.
 K tomu budete
 potřebovat z internetu stáhnout soubor s firmware\footnote{
 \url{https://www.telekom.de/hilfe/downloads/firmware-speedport-w921v-1.40.000.bin}},
@@ -12,14 +12,15 @@ stáhnout a pracovat s přejmenovanou kopií.
 }. Soubor stáhněte, změňte číslo verze z 1.40.000 na 1.21.000 \footnote{\gls{openwrt}
 \wrtversion počítá se starší verzí firmware VDSL subsystému.}
 a nakopírujte programem WinSCP\footnote{Na Linuxu použijte příkaz
-{\texttt{scp soubor.bin root@192.168.1.1:/tmp}}.} na svůj router. Uživatel pro přihlášení
-je \uv{root}, adresa hosta \uv{192.168.1.1}, heslo pak Vámi čerstvě nastavené.
+{\texttt{scp soubor.bin root@192.168.1.1:/tmp}}.} na svůj router.
 Tento soubor uložte na router do adresáře \uv{/tmp}.
 
-Nyní se na přihlaste na router klientem příkazové řádky -- pod Windows můžete
+Nyní se na přihlaste na router klientem protokolu \gls{ssh} -- pod Windows můžete
 použít program \uv{putty}\footnote{\url{http://www.slunecnice.cz/sw/putty-cz/}} -- viz \todo{ilustrace}\footnote{\texttt{ssh root@192.168.1.1}}.
+Uživatel pro přihlášení
+je \uv{root}, adresa hosta \uv{192.168.1.1}, heslo pak Vámi čerstvě nastavené.
 Po přihlášení spusťte příkaz \uv{vdsl\_fw\_install.sh}, který ze staženého firmware
 získá firmware pro VDSL subsystém modemu. Pro rozbalení je potřeba odsouhlasit
 licenci staženého firmware.
 
-Pro nastavení VDSL pripojení nyní postupujte podle návodu v sekci \ref{net:vdsl}.
+Pro nastavení VDSL připojení nyní postupujte podle návodu v sekci \ref{net:vdsl}.

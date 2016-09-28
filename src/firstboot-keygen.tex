@@ -1,0 +1,20 @@
+\subsection{Kryptografické klíče pro SSH}
+Ačkoliv není tento krok nutný, je vhodné pokračovat regenerováním klíčů pro
+šifrovanou správu zařízení.
+Častým neduhem výrobcem dodaného firmware je, že vyrobené routery
+sdílejí šifrovací klíče\footnote{\url{http://www.root.cz/clanky/miliony-zarizeni-sdili-privatni-klice-k-https-a-ssh/}}
+(což je z hlediska bezpečnosti
+přinejmenším nežádoucí). Ačkoliv \gls{openwrt} toto obchází tak, že se klíče
+generují až při prvním startu zařízení, je užitečné si klíče vygenerovat znovu
+(o chvíli) později ručně.
+
+Nyní se na přihlaste na router pomocí protokolu Telnet\footnote{\gls{openwrt}
+ve verzi trunk už Telnet nepodporuje.} -- pod Windows můžete
+použít program \uv{putty}\footnote{\url{http://www.slunecnice.cz/sw/putty-cz/}} -- viz \todo{ilustrace}\footnote{\texttt{telnet 192.168.1.1}}.
+Zatím není nastaveno heslo a do zařízení se tedy dostanete obratem.
+Nyní je potřeba smazat staré klíče a vygenerovat nové. To provedete následujícími
+příkazy:
+\begin{verbatim}
+rm -f /etc/dropbear/*host_key
+/etc/init.d/dropbear restart
+\end{verbatim}
