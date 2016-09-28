@@ -8,14 +8,14 @@ Webové rozhraní má dva režimy ukládání změn -- \uv{Save} a \uv{Save \& A
 Režim \uv{Save} pouze poznačí změny v nastavení, avšak neaplikuje je. Pokud
 není k dispozici tlačítko \uv{Save \& Apply}, můžete očekávat že změny budou
 aplikovány obratem (např. některá nastavení síťových rozhraní). Režim
-\uv{save \& Apply} je pak explicitně rozlišen tam, kde je možné provádět změny
+\uv{Save \& Apply} je pak explicitně rozlišen tam, kde je možné provádět změny
 bez jejich okamžité aplikace (\uv{Save}), nebo je naopak žádoucí explicitně
 chtít jejich aplikaci (\uv{Save \& Apply}).
 
 Při použití příkazové řádky najdete nastavení základního systému v adresáři
 routeru \uv{/etc/config}.
 Zde se nachází sada souborů, kde každý soubor odpovídá nějakému subsystému.
-Tyto soubory můžete manipulovat buď textovým editorem, nebo pomocí nástroje
+S těmito soubory můžete manipulovat buď textovým editorem, nebo pomocí nástroje
 \uv{uci}. Soubory jsou dále strukturované na jednotlivé sekce, které obsahují
 klíče. Spojením jména subsystému, sekce a klíče pak vzniká plnohodnotný
 název klíče. Některé klíče se v téže sekci mohou opakovat, jiné nesmí.
@@ -25,7 +25,7 @@ Základní operace s \uv{uci} jsou:
 \item[\textbf{show}] -- příkaz \uv{uci show wireless} vypíše nastavení wifi.
 \item[\textbf{set}] -- příkaz \uv{uci set 'wireless.@wifi-iface[0].ssid=OpenWRT-je-doma'}
 změní jméno wifi sítě na řetězec \uv{OpenWRT-je-doma}. Apostrofy v příkazu jsou nutné
-kvůli speciálním znakům [] ve jméně klíče. Odpovídá změně uložené tlačítkem
+kvůli speciálním znakům [~] ve jméně klíče. Odpovídá změně uložené tlačítkem
 \uv{Save} webového rozhraní.
 \item[\textbf{commit}] -- aplikuje změny v nastavení. Odpovídá aplikaci změn,
 provedené tlačítkem \uv{Save \& Apply} webového rozhraní.
