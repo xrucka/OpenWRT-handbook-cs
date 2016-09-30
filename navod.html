@@ -1,0 +1,500 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Zjednodušený návod k OpenWRT pro TP-Link TD-W8970B rev. 1.0</title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">Zjednodušený návod k OpenWRT pro TP-Link TD-W8970B rev. 1.0</h1>
+</div>
+<h1 id="úvod" class="unnumbered">Úvod</h1>
+<p>Zdravím, tento neoficiální návod k OpenWRT vznikl primárně proto, aby novým uživatelům pomohl si zvyknout na trochu jiný firmware, než běžně potkají. Neklade si za cíl vysvětlit, ani naučit vše, ale snad bude stačit k většině běžných úkonů.</p>
+<h2 id="co-to-je-gls-openwrt" class="unnumbered">Co to je OpenWRT?</h2>
+<p>OpenWRT je alternativní firmware pro síťový hardware, založený na operačním systému Linux. Pokud Linux neznáte a slyšeli jste o něm jen zkazky, že jde o nějakou zastaralou hrůzu, připomínající největší temnoty systému MS DOS, pak jim nevěřte. I když to není na první pohled znát, i takový Android je jen sadou aplikací, spuštěných v Linuxu. Protože – stejně stejně jako Linux – je bezplatně spoluvyvíjen komunitou uživatelů a programátorů, je množství podporovaných zařízení poněkud omezeno. Naštěstí ale máte jedno ze zařízení, která podporována jsou.</p>
+<h2 id="ovládání" class="unnumbered">Ovládání</h2>
+<p>Co tedy potřebujete vědět o ovládání svého routeru?</p>
+<p><span><strong>Webové rozhraní</strong></span> Webové rozhraní dodávané s OpenWRT se jmenuje LuCI. Je naprogramováno v jazyce Lua a existuje pro něj řada rozšiřujících aplikací. Protože je ale OpenWRT plnohodnotný Linux – a tedy na něm lze provozovat prakticky jakoukoliv Linuxovou aplikaci – je také současně nemožné naprogramovat webové rozhraní pro každou aplikaci.</p>
+<p><span><strong>Terminálové rozhraní</strong></span> Síla (a pro nové uživatele také slabina) ovládání Linuxu spočívá v příkazové řádce. Na tu se lze připojit pomocí zabezpečené služby SSH. Ta probíhá po šifrovaném komunikačním kanálu, což je jeden ze základních stavebních kamenů bezpečnosti Vašeho routeru. Protože ale SSH potřebuje pro své fungování krom uživatelského jména i heslo, není zprvu možné SSH použít. Pro nastavení hesla tedy použijte webové rozhraní.</p>
+<h2 id="seznam-zkratek" class="unnumbered">Seznam zkratek</h2>
+<dl>
+<dt><strong>OpenWRT</strong></dt>
+<dd><p>OpenWRT je distribuce Linuxu, navržená pro malá zařízení - mnohdy síťové prvky. Je sestaveno od základu jako plnohodnotný Linux. To má za následek mimo jiné to, že je mnohdy aktuálnější (a tedy i bezpečnější) než nejeden oficiální firmware, dodaný výrobcem či poskytovatelem internetu.</p>
+</dd>
+<dt><strong>SOHO</strong></dt>
+<dd><p>SOHO routery jsou malé routery, navržené pro použití v domácnostech a malých firmách (Small Office, HOme). Obvykle nekypí kdo ví jak výkonným hardware, avšak jejich cenová dostupnost z nich dělá velmi rozšířená - a v případě některých modelů, kompatibilních s OpenWRT - i použitelná zařízení.</p>
+</dd>
+<dt><strong>WAN</strong></dt>
+<dd><p>Wide Area Network - obvyklé označení pro nelokální síť - zpravidla Internet. WAN rozhraním jste připojení ke svému poskytovateli internetu (ať už kabelovou přípojkou, síťovým kabelem nebo VDSL linkou).</p>
+</dd>
+<dt><strong>LAN</strong></dt>
+<dd><p>Local Area Network - &quot;domácí&quot; síť routeru, resp. síť, pro kterou router přiděluje adresy a/nebo zprostředkovává připojení k internetu.</p>
+</dd>
+<dt><strong>VDSL</strong></dt>
+<dd><p>Very-high-bit-rate Digital Subscriber Line - technologie v principu rozšiřující ADSL, ale s jinými signalizacemi. Postupně vytlačuje ADSL.</p>
+</dd>
+<dt><strong>ADSL</strong></dt>
+<dd><p>Asymmetric Digital Subscriber Line - starší typ DSL, dnes postupně vytlačován VDSL.</p>
+</dd>
+<dt><strong>DSLAM</strong></dt>
+<dd><p>Digital Subscriber Line Access Multiplexer - zjednodušeně řečeno, protikus xDSL modemu.</p>
+</dd>
+<dt><strong>SOC</strong></dt>
+<dd>System on Chip představuje spojení čipové sady základní desky a procesoru, zpravidla do jednoho či několika málo čipů. Právě volba SOC bývá určující pro výkon routeru a podporované funkce.
+</dd>
+<dt><strong>SSH</strong></dt>
+<dd><p>Secure Shell - protokol vzdáleného terminálu. Disponuje šifrováním a mechanismem pro přihlašování bez hesla - soukromým a veřejným klíčem.</p>
+</dd>
+<dt><strong>LuCI</strong></dt>
+<dd><p>Lua Configuration Interface - webové rozhraní pro nastavení OpenWRT.</p>
+</dd>
+<dt><strong>VLAN</strong></dt>
+<dd><p>Virtual LAN - způsob značkování paketů na fyzické lince, umožňující přenos více logických sítí po stejném médiu. Číslo logické sítě, nesené v této značce se pak označuje jako VLAN ID.</p>
+</dd>
+<dt><strong>UUID</strong></dt>
+<dd><p>Universally Unique IDentifier - unikátní identifikátor, zpravidla disku. Narozdíl od uzlu zařízení nezávisí na tom, kdy bylo zařízení připojeno a je přenositelný mezi počítači.</p>
+</dd>
+<dt><strong>GPIO</strong></dt>
+<dd><p>General Purpose Input Output - sada pinů, které lze použít k propojení s takřka libovolným hardware. Za obecnost platí tím, že řadič takto vytvořeného propojení je nutno implementovat v software.</p>
+</dd>
+</dl>
+<h1 id="první-připojení">První připojení</h1>
+<p>Než začnete se zběsilým připojováním routeru k síti, pročtěte si prosím tyto instrukce. První podsekce slouží jako motivace k externímu úložišti a ačkoliv není svým obsahem pro úplné začátečníky zcela srozumitelná a odkazuje se na znalosti z následujících sekcí, nese důležitou myšlenku. Věnujte jí tedy prosím zvláště zvýšenou pozornost.</p>
+<p>Druhá sekce patří také mezi volitelné postupy a stojí za zvážení. Třetí sekce popíše způsob nastavení hesla a konečně čtvrtá sekce zprovozní VDSL modem vestavěný do routeru.</p>
+<p>Váš router je po instalaci firmware nastaven tak, aby používal IPv4 adresu 192.168.1.1. Propojte jej tedy síťovým kabelem se svým počítačem (využijte port routeru “Lan 1”).</p>
+<h2 id="firstboot:extroot">Systém na flashdisku</h2>
+<p>SOHO routery obvykle bývají zařízení s minimem paměti, u kterých výrobce šetří na každém kousku. Proto se vyplatí využít toho, že OpenWRT umí využít připojený flashdisk pro rozšíření interní paměti. Toto má ale další praktický důsledek – pokud byste si špatným nastavením zablokovali přístup k routeru, není nic jednoduššího, než router vypnout, flashdisk připojit do počítače a opravit nastavení.</p>
+<p>Má osobní praxe s každým novým routerem je následující:</p>
+<ol style="list-style-type: decimal">
+<li><p>Nahraji svůj veřejný SSH klíč<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>.</p></li>
+<li><p>Nainstaluji podporu pro externí úložiště.</p></li>
+<li><p>Zakáži WAN rozhraní.</p></li>
+<li><p>Wifi povolím a přejmenuji na něco dostatečně jednoznačného (např. “router-v-nouzi”).</p></li>
+<li><p>Vypnu přístup přes webové rozhraní.</p></li>
+<li><p>Toto nastavení zkopíruji na flashdisk. Na ten zkopíruji i soubor “/etc/banner”, kde provedu změnu tak, abych po přihlášení vždy věděl, že router nastartoval z flashdisku.</p></li>
+<li><p>Router restartuji, ověřím že startuje z flashdisku, povolím webové rozhraní a nastavím pro ostrý provoz.</p></li>
+</ol>
+<p>Pokud se tedy se systémem na mém routeru cokoliv stane, mohu problém snadno vyřešit přepsáním flashdisku nejnovější zálohou. Zvláště těm, kdo rádi experimentují může toto preventivní opatření ušetřit nejednu pernou chvilku. Tato sekce je záměrně uvedena na začátku návodu k nastavení, neboť pokud se externí úložiště rozhodnete používat, pak je dobré s ním počítat od úplného začátku. Pro detaily se prosím podívejte na sekci [extroot].</p>
+<h2 id="kryptografické-klíče-pro-ssh">Kryptografické klíče pro SSH</h2>
+<p>Ačkoliv není tento krok nutný, je vhodné pokračovat regenerováním klíčů pro šifrovanou správu zařízení. Častým neduhem výrobcem dodaného firmware je, že vyrobené routery sdílejí šifrovací klíče<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> (což je z hlediska bezpečnosti přinejmenším nežádoucí). Ačkoliv OpenWRT toto obchází tak, že se klíče generují až při prvním startu zařízení, je užitečné si klíče vygenerovat znovu (o chvíli) později ručně.</p>
+<p>Nyní se na přihlaste na router pomocí protokolu Telnet<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> – pod Windows můžete použít program “putty”<a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> – viz TODO: ilustrace<a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a>. Zatím není nastaveno heslo a do zařízení se tedy dostanete obratem. Nyní je potřeba smazat staré klíče a vygenerovat nové. To provedete následujícími příkazy:</p>
+<pre><code>rm -f /etc/dropbear/*host_key
+/etc/init.d/dropbear restart</code></pre>
+<h2 id="nastavení-hesla">Nastavení hesla</h2>
+<p>Ve webovém prohlížeči otevřete adresu 192.168.1.1. Klikněte na tlačítko “login” a přihlaste se.</p>
+<p>Po přihlášení Vás uvítá přehledová obrazovka, na které najdete souhrnné informace o Vašem zařízení. Na horní liště najdete nabídku “System”, ve které rozklepněte položku “Administration”. Tím se dostanete na stránku, kde je možné nastavit heslo pro správu routeru. Heslo se v žádném případě nevyplatí nechat nenastavené, avšak pozor - v případě že heslo zapomenete, nebude jednoduché se do routeru opět dostat. Zvolené heslo si někam pro jistotu poznamenejte a schovejte. Namísto krkolomných hesel můžete použít jednoduchou větu (nejlépe bez háčků a čárek), kterou si ovšem snadno zapamatujete.</p>
+<h2 id="firstboot:vdslfw">Firmware VDSL</h2>
+<p>Nyní tedy ke zprovoznění samotného VDSL. K tomu budete potřebovat z internetu stáhnout soubor s firmware<a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a>, který z licenčních důvodů není možné dodávat spolu s OpenWRT<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>. Soubor stáhněte a nakopírujte programem WinSCP<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a> na svůj router. Tento soubor uložte na router do adresáře “/tmp”.</p>
+<p>Nyní se na přihlaste na router klientem protokolu SSH – pod Windows můžete použít program “putty”<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a> – viz TODO: ilustrace<a href="#fn10" class="footnoteRef" id="fnref10"><sup>10</sup></a>. Uživatel pro přihlášení je “root”, adresa hosta “192.168.1.1”, heslo pak Vámi čerstvě nastavené. Po přihlášení spusťte následující příkazů, která pozáplatuje instalační skript pro firmware a následně firmware nainstaluje<a href="#fn11" class="footnoteRef" id="fnref11"><sup>11</sup></a>.</p>
+<pre><code>sed -i &#39;s#Firmware_Speedport_W921V_1.21.000.bin#firmware-speedport-w921v-1.40.000.bin#g&#39; /sbin/vdsl_fw_install.sh
+sed -i &#39;s#hilfe.telekom.de/dlp/eki/downloads/Speedport/Speedport%20W%20921V#www.telekom.de/hilfe/downloads#g&#39; /sbin/vdsl_fw_install.sh
+sed -i &#39;s#0a099d08dbf091c74d685b532cbb1390#409a69b9a4eeffd681cb2dd84d6edf6d#g&#39; /sbin/vdsl_fw_install.sh
+sed -i &#39;s#59dd9dc81195c6854433c691b163f757#655442e31deaa42c9c68944869361ec0#g&#39; /sbin/vdsl_fw_install.sh
+sed -i &#39;s#06b6ab3481b8d3eb7e8bf6131f7f6b7f#57f2d07f59e11250ce1219bad99c1eda#g&#39; /sbin/vdsl_fw_install.sh
+ls -s /tmp/firmware-speedport-w921v-1.40.000.bin /tmp/Firmware_Speedport_W921V_1.21.000.bin#firmware-speedport-w921v-1.40.000.bin
+vdsl_fw_install.sh</code></pre>
+<p>Pro rozbalení je potřeba odsouhlasit licenci staženého firmware.</p>
+<p>Pro nastavení VDSL připojení nyní postupujte podle návodu v sekci [net:vdsl].</p>
+<h1 id="jak-funguje-nastavení">Jak funguje nastavení</h1>
+<p>Nastavení OpenWRT lze (obecně) spravovat dvěma způsoby – webovým rozhraním a příkazovou řádkou. Každému uživateli může vyhovovat jiné ovládání, v obecné rovině ale platí že s příkazovou řádkou zmůžete více. Na základní ovládání ale plně postačuje webové rozhraní.</p>
+<p>Webové rozhraní má dva režimy ukládání změn – “Save” a “Save &amp; Apply”. Režim “Save” pouze poznačí změny v nastavení, avšak neaplikuje je. Pokud není k dispozici tlačítko “Save &amp; Apply”, můžete očekávat že změny budou aplikovány obratem (např. některá nastavení síťových rozhraní). Režim “Save &amp; Apply” je pak explicitně rozlišen tam, kde je možné provádět změny bez jejich okamžité aplikace (“Save”), nebo je naopak žádoucí explicitně chtít jejich aplikaci (“Save &amp; Apply”).</p>
+<p>Při použití příkazové řádky najdete nastavení základního systému v adresáři routeru “/etc/config”. Zde se nachází sada souborů, kde každý soubor odpovídá nějakému subsystému. S těmito soubory můžete manipulovat buď textovým editorem, nebo pomocí nástroje “uci”. Soubory jsou dále strukturované na jednotlivé sekce, které obsahují klíče. Spojením jména subsystému, sekce a klíče pak vzniká plnohodnotný název klíče. Některé klíče se v téže sekci mohou opakovat, jiné nesmí.</p>
+<p>Základní operace s “uci” jsou:</p>
+<dl>
+<dt><strong>show</strong></dt>
+<dd><p>Příkaz “uci show wireless” vypíše nastavení wifi.</p>
+</dd>
+<dt><strong>set</strong></dt>
+<dd><p>Příkaz “uci set ’wireless.<span class="citation">@wifi-iface</span>[0].ssid=OpenWRT-je-doma’” změní jméno wifi sítě na řetězec “OpenWRT-je-doma”. Apostrofy v příkazu jsou nutné kvůli speciálním znakům [ ] ve jméně klíče. Odpovídá změně uložené tlačítkem “Save” webového rozhraní.</p>
+</dd>
+<dt><strong>commit</strong></dt>
+<dd><p>Aplikuje změny v nastavení. Odpovídá aplikaci změn, provedené tlačítkem “Save &amp; Apply” webového rozhraní.</p>
+</dd>
+<dt><strong>–help</strong></dt>
+<dd><p>– vyobrazí nápovědu k ovládání nástroje uci.</p>
+</dd>
+</dl>
+<h1 id="síť">Síť</h1>
+<p>Nastavení sítě najdete ve webovém rozhraní v záložce “Network”. Zde, na kartě “Interfaces” je k dispozici přehled síťových rozhraní, která jsou na routeru nastavena.</p>
+<p>OpenWRT pracuje s konceptem virtuálních rozhraní, která jsou mapována na rozhraní fyzická. Toto umožňuje jednomu fyzickému rozhraní nastavit více různých adres. V případě, že nějaké virtuální rozhraní používáme k přidání adresy, slouží jako jeho fyzické rozhraní jméno virtuálního rozhraní, kterému přidává adresu. Toto jméno je na začátku předsazeno znakem zavináče. Pro ilustraci se zaměřte na rozhraní “wan” a “wan6”.</p>
+<h4 id="upozornění">Upozornění:</h4>
+<p>tlačítko “Delete” provádí operaci “Save &amp; Apply”, buďte tedy při práci s ním nejvýše opatrní. Pokud budete provádět změny v nastavení rozhraní LAN, pak si raději vytvořte pomocné rozhraní se statickou adresou, než abyste si odřízli přistup k routeru.</p>
+<h2 id="úprava-existujícího-rozhraní">Úprava existujícího rozhraní</h2>
+<p>Úpravu existujícího nastavení provedete tlačítkem “edit” u odpovídajícího síťového rozhraní. Tímto se dostanete k volbám tohoto rozhraní, kde můžete na záložce “General setup” nastavit IP adresy tohoto rozhraní.</p>
+<p>Na kartě “Physical settings” pak nastavujete na která fyzická rozhraní se má virtuální rozhraní promítat<a href="#fn12" class="footnoteRef" id="fnref12"><sup>12</sup></a> Pokud chcete použít stejnou adresaci pro dvě různá fyzická rozhraní, musí být nad těmito rozhraními vytvořen síťový bridge. Bridge vytvoří nad síťovým rozhraním virtuální switch, kde jednotlivá fyzická rozhraní představují porty switche. Toto má za důsledek to, že počítače z jednoho fyzického rozhraní budou moci komunikovat přímo s počítači z druhého fyzického rozhraní. Stejně, jako kdyby byly připojeny do skutečného switche. Řada routerů navíc má vestavěn hardwarový switch, pokrývající ethernetové porty. Pokud máte ethernetové rozhraní WAN, nikdy jej nepřidávejte do bridge s LAN bez ověření, zda nejsou na stejném hardwarovém switchi.</p>
+<p>Na kartě “Firewall” máte k dispozici možnost přiřadit rozhraní do zóny firewallu. Vlastní firewall pak najdete v samostatné záložce. Pro jeho fungování je potřeba přijmout, že openwrt používá tzv. zónový firewall - místo definice pravidel pro jednotlivá fyzická rozhraní definujete pravidla pro zóny. Konfigurací firewallu tato příručka nepokrývá, s výjimkou některých nastavení specifických pro síť O2, uvedených na konci příručky.</p>
+<h2 id="net:switch">Switch</h2>
+<p>V záložce “Network -&gt; Switch” najdete nastavení vestavěného hardwarového switche. Tento má tzv. logické porty, jejichž číslování nemusí odpovídat číslování fyzickému. A mnohdy také neodpovídá. U některých zařízení jsou LAN a WAN porty prezentovány jako oddělené hardwarové síťové karty (kde switch je připojen k LAN), na jiných jsou obé jen jinak barevně rozlišené porty na zádech routeru, všechny připojené do switche. Aby tato rozhraní v systému vystupovala odděleně, je každému z nich nastavena oddělená VLAN.</p>
+<table>
+<caption>Mapování logických portů switche na fyzické označení portu pro TP-Link TD-W8970B</caption>
+<thead>
+<tr class="header">
+<th align="left">Číslo portu switche</th>
+<th align="left">fyzické označení portu</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">LAN 2</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">nezapojeno</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">LAN 3</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">nezapojeno</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">LAN 4</td>
+</tr>
+<tr class="even">
+<td align="left">5</td>
+<td align="left">LAN 1</td>
+</tr>
+<tr class="odd">
+<td align="left">6</td>
+<td align="left">CPU</td>
+</tr>
+</tbody>
+</table>
+<p>Co je to VLAN? Virtual LAN - způsob značkování paketů na fyzické lince, umožňující přenos více logických sítí po stejném médiu. Aby VLAN fungovala, musí se při vysílání paketu přidat před paket značka s číslem, do které VLAN paket patří. Příjemce pak musí mít pro stejnou VLAN nastavenu stejnou síť. Protože ne vždy je toto značkování (angl. tagged) žádoucí, je možné použít neznačkovaný režim portu. To znamená, že při vysílání ven je značka odstraněna a naopak při přijetí je značka doplněna (angl. untagged). Port může být veden jako neznačkovaný pro nejvýše jednu VLAN.</p>
+<p>Toto umožňuje realizovat jak WAN, tak LAN rozhraní jedním switchem. Logické WAN rozhraní je tvořeno jednou VLAN (např. VLAN ID 2), kdežto LAN jinou VLAN (např. VLAN ID 1). Porty, patřící do fyzické LAN jsou pak neznačkované (untagged) pro VLAN 1 se zakázanou VLAN 2, porty pro WAN pak naopak.</p>
+<p>Některé routery mají hybridní zapojení síťového hardware – WAN i LAN jsou přivedeny do stejného switche, kde jsou realizovány pomocí VLAN. Avšak namísto toho, aby byl tento switch dalším portem připojen k CPU, je k CPU připojen hned dvěma porty. Jeden tento port pak patří do VLAN reprezentující WAN, druhý pak plní stejnou úlohu pro LAN.</p>
+<p>Pokud byste chtěli WAN port přemostit do LAN, pak si zkontrolujte že není reprezentován jako VLAN. Přemostění dvou vlan pomocí bridge by mohlo vyústit v chybnou konfiguraci routeru. V takovém případě raději přidejte WAN port do stejné VLAN. Naopak, pokud budete chtít některý z LAN portů použít pro WAN, přiřaďte mu (neznačkovanou) VLAN použitou pro WAN port.</p>
+<p>Ačkoliv OpenWRT umožňuje mít odlišné VLAN ID a identifikátor pro síťové rozhraní, je lepší mít tyto nastaveny na stejnou hodnotu – odlišné nastavení nemusí na řadě routerů fungovat. Na konkrétní VLAN se pak v konfiguraci rozhraní odkážete přes jméno switche (zpravidla “eth0”), doplněné tečkou a číslem rozhraní (tedy “eth0.1” pro LAN). Aby tato možnost fungovala, musí být port CPU vždy označen za značkovaný pro každou VLAN.</p>
+<p>Se změnami VLAN buďte opatrní, zvláště pokud zasahujete do připojení k procesoru. V takovém případě doporučuji jednak použít externí úložiště, druhak nastavit vše najednou pomocí příkazové řádky (nejlépe textovým editorem), vše si po sobě několikrát opakovaně přečíst a teprve posléze nastavení aplikovat restartem.</p>
+<h2 id="net:vdsl">VDSL</h2>
+<p>Router TP-Link TD-W8970B je osazen i DSL modemem<a href="#fn13" class="footnoteRef" id="fnref13"><sup>13</sup></a> podporujícím jak ADSL 2+, tak VDSL 1/2. Na rozdíl od DSL routerů s SOC značky Broadcom pro tento existují ovladače kompatibilní s OpenWRT a tedy je možné tento router použivat i pro DSL připojení. Pro zprovoznění DSL subsystému je potřeba nainstalovat balíček “ltq-vdsl-app” a stáhnout licenčně omezený binární firmware modemu (procedura instalace binárního firmware blíže popsána v sekci [firstboot:vdslfw])</p>
+<p>Nastavení fyzické vrstvy modemu pak lze najít v souboru “/etc/config/network”. Pro toto nastavení slouží sekce typu vdsl. Příklad nastavení modemu pomocí nástroje uci lze najít v ilustraci [net:vdsl:phy]. Sekce obnáší následující klíče:</p>
+<dl>
+<dt>annex</dt>
+<dd><p>Jednoznakové označení DSL annexu, který se pro komunikaci má použít (malým písmenem). Jednotlivé annexy jsou historicky-územně vymezeny (důsledek technologií dříve používaných pro realizaci telefonní sítě). V české republice se již dnes annex A nepoužívá a soudobá infrastruktura je založena na annexu B.</p>
+</dd>
+<dt>firmware</dt>
+<dd><p>Cesta k souboru s binárním frmware pro modem. Pokud nemáte závažný důvod směrovat ji jinam, měla by obnášet “/lib/firmware/vdsl.bin”.</p>
+</dd>
+<dt>tone</dt>
+<dd><p>Vybírá sadu tónů, použitou pro navázání komunikace. Mezi možné sady patří “a”, “b”, “x”; přičemž k sadám “a” a “b” lze připojit znak “v”, značící vektorizaci. Vektorizace je formou kompenzace přeslechů mezi páry telefonních vodičů, která se musí předpočítat na DSLAMu. Mimo jiné tvoří nedílnou součást VDSL2.</p>
+</dd>
+<dt>xfer_mode</dt>
+<dd><p>Režim přenosu dat. Pro starší technologie (ADSL) bylo používáno “atm” (asynchronní přenosový mód), kdežto VDSL se opírá o “ptm” (paketový režim přenosu).</p>
+</dd>
+</dl>
+<!-- -->
+<pre><code>uci set network.dsl.annex=b
+uci set network.dsl.firmware=/lib/firmware/vdsl.bin
+uci set network.dsl.tone=bv
+uci set network.dsl.xfer_mode=ptm
+uci commit network</code></pre>
+<p>Samotné fyzické nastavení ale nepostačuje, je potřeba ještě nastavit přihlašovací údaje. Tyto se nastavují pomocí odpovídajícího virtuálního rozhraní (zpravidla pojmenovaného “wan”). Toto rozhraní pak musí mít za fyzické rozhranní zvoleno zařízení modemu (typicky “ptm0”) s identifikátorem VLAN dle instrukcí poskytovatele připojení (obdoba VPI/VCI u ADSL). Příkladem budiž jméno rozhraní “ptm0.848”. Toto rozhraní takřeka jistě nebude v nabídce, tudíž je potřeba při jeho zadávání ve webovém rozhraní použít textové pole. Ukázku nastavení pro síť O2 lze najít v sekci [o2:frag:network].</p>
+<h1 id="extroot">Systém na externím úložišti (extroot)</h1>
+<p>Externím úložištěm je zparvidla<a href="#fn14" class="footnoteRef" id="fnref14"><sup>14</sup></a> flashdisk, sdkarta či jiné paměťové zařízení, připojené přes USB.</p>
+<h2 id="extroot:umount">Odpojení stávajících souborových stystémů</h2>
+<p>Než budete pokračovat, musíte zjistit uzel zařízení flashdisku a odpojit stávající souborové systémy na něm.</p>
+<pre language="sh"><code>linux@localhost:/tmp&gt; dmesg | tail | grep Attached # zjistim jmeno uzlu
+[167819.765155] sd 7:0:0:0: Attached scsi generic sg4 type 0
+[167819.774927] sd 7:0:0:0: [sde] Attached SCSI removable disk
+linux@localhost:/tmp&gt; # jmeno uzlu je u mne sde, cesta k zarizeni tedy /dev/sde
+linux@localhost:/tmp&gt; # odpojim existujici souborove systemy
+linux@localhost:/tmp&gt; sudo umount /dev/sde*</code></pre>
+<h2 id="formátování-disku">Formátování disku</h2>
+<p>Předpokládejme tedy použití flashdisku. Ke zprovoznění USB portu je potřeba zpravidla balíček <span><code>k</code>mod-usb-storage</span> a ovladač sběrnice USB (zpravidla <span><code>k</code>mod-usb2</span> pro routery osazené porty USB 2.0). Dále je zapotřebí ovladač zvoleného souborového systému (například <span><code>k</code>mod-fs-ext4</span>). Posledními potřebnými balíčky jsou <span><code>b</code>lock-mount</span> a <span><code>s</code>wap-utils</span>.</p>
+<p>Následující část předpokládá práci s Linuxem, ať už na jiném počítači, nebo na routeru jako takovém (v takovém případě budete potřebovat i balíčky <span><code>e</code>2fsprogs fdisk</span>).</p>
+<p>Flashdisk připojte ke zvolenému Linuxu a rozdělte na dva oddíly - první, menší, bude sloužit jako swap (oddíl, kam se dočasně odkládají nevyužité paměťové bloky z RAM), druhý jako samotný extroot. Pro menší oddíl bude postačovat pár MiB (např. 64 MiB), router jej za nomrálních okolností nebude využívat. ID typu oddílu nastavte na 82 (Linux swap). Druhý oddíl pak zabere zbytek disku.</p>
+<p>Nejprve tedy spustíme program fdisk a na flashdisku vytvoříme prázdnou tabulku rozložení disku:</p>
+<pre><code>linux@localhost:/tmp&gt; sudo fdisk /dev/sde
+
+Vítejte v fdisku (util-linux 2.28.2).
+Změny zůstanou pouze v paměti, dokud se nerozhodnete je uložit na disk.
+Při použití příkazu zápisu buďte obezřetní.
+
+Příkaz (m pro nápovědu): o
+Vytvořena nová dosová tabulka rozdělení disku s identifikátorem 0x9b990a7e.</code></pre>
+<p>Následně připravíme první oddíl:</p>
+<pre><code>Příkaz (m pro nápovědu): n
+Typ oddílu
+   p   primární (0 primární, 0 rozšířený, 4 volný)
+   e   rozšířený (kontejner pro logické oddíly)
+Vyberte (výchozí p): p
+Číslo oddílu (1-4, výchozí je 1):
+První sektor (2048-1965055, výchozí je 2048):
+Poslední sektor, +sektorů nebo +velikost{K,M,G,T,P}
+    (2048-1965055, výchozí je 1965055): +64M
+
+Vytvořen nový oddíl 1 typu &quot;Linux&quot; o velikosti 64 MiB.
+
+Příkaz (m pro nápovědu): t
+Vybrán oddíl 1
+Typ oddílu (L vypíše všechny typy): 82
+Typ oddílu &quot;Linux&quot; byl změněn na &quot;Linux swap / Solaris&quot;.</code></pre>
+<p>Nyní druhý oddíl:</p>
+<pre><code>Příkaz (m pro nápovědu): n
+Typ oddílu
+   p   primární (1 primární, 0 rozšířený, 3 volný)
+   e   rozšířený (kontejner pro logické oddíly)
+Vyberte (výchozí p):
+
+Použije se výchozí odpověď p.
+Číslo oddílu (2-4, výchozí je 2):
+První sektor (133120-1965055, výchozí je 133120):
+Poslední sektor, +sektorů nebo +velikost{K,M,G,T,P}
+    (133120-1965055, výchozí je 1965055):
+
+Vytvořen nový oddíl 2 typu &quot;Linux&quot; o velikosti 894,5 MiB.</code></pre>
+<p>Nakonec zkontrolujeme výsledek a zapíšeme tabulku rozložení disku:</p>
+<pre><code>Příkaz (m pro nápovědu): p
+Disk /dev/sde: 959,5 MiB, 1 006 108 672 bajtů, 1 965 056 sektorů
+Jednotky: sektorů po 1 * 512 = 512 bajtech
+Velikost sektoru (logického/fyzického): 512 bajtů / 512 bajtů
+Velikost I/O (minimální/optimální): 512 bajtů / 512 bajtů
+Typ popisu disku: dos
+Identifikátor disku: 0x9b990a7e
+
+Zařízení   Zaveditelný Začátek   Konec Sektory Velikost ID Druh
+/dev/sde1                 2048  133119  131072      64M 82 Linux swap/Solaris
+/dev/sde2               133120 1965055 1831936   894,5M 83 Linux
+
+Příkaz (m pro nápovědu): w
+Tabulka rozdělení disku byla změněna.
+Volám ioctl() pro znovunačtení tabulky rozdělení disku.
+Synchronizují se disky.</code></pre>
+<p>Nově vzniklé oddíly je potřeba inicializovat odpovídajícím souborovým systémem. Souborový systém extrootu je navíc vhodné pojmenovat, aby nedošlo k náhodnému přemazání dat potomkem, který hledá flashdisk na svůj powerpoint do školy. Pokud máte routerů více, je dobré poznačit si do jmenovky, ke kterému routeru tento disk patří. UUID nově vzniklých souborových systémů si poznačte, budete je potřebovat.</p>
+<pre><code>linux@localhost:/tmp&gt; sudo mkswap /dev/sde1
+mkswap: /dev/sde1: pozor: odstraňuje se starý vzorec ext4.
+Vytváří se odkládací prostor verze 1, velikost = 64 MiB (67104768 bajtů)
+žádná jmenovka, UUID=24623eae-5c3c-4454-86d4-f483a360e39d
+
+linux@localhost:/tmp&gt; sudo mkfs.ext3 -L &quot;openwrt-w8970b/&quot; /dev/sde2
+mke2fs 1.43.1 (08-Jun-2016)
+/dev/sde2 obsahuje systém souborů ext2 se jmenovkou &quot;ap-extroot&quot;&quot;
+    naposledy připojeno do /tmp/extroot/overlay v Mon Jan 11 10:38:27 2016
+Přesto pokračovat? (a,n) a
+Vytváří se systém souborů s 228992 (4k) bloky a 57344 uzly
+UUID systému souborů=4a12f341-0046-4aab-aa47-d3baafed85cf
+Zálohy superbloku uloženy v blocích:
+    32768, 98304, 163840
+
+Alokují se tabulky skupin: hotovo
+Zapisuji tabulky iuzlů: hotovo
+Vytváří se žurnál (4096 bloků): hotovo
+Zapisuji superbloky a účtovací informace systému souborů: hotovo</code></pre>
+<h2 id="příprava-na-straně-openwrt">Příprava na straně OpenWRT</h2>
+<p>Připravte si kostru souboru <span><code>/</code>etc/config/fstab</span>. Tento bude obnášet jednak obecná nastavení, druhak údaje k připojení disků. Z předchozí sekce máte poznačená UUID, která budete nyní potřebovat. Pokud jste si UUID nepoznačili, můžete použít nástroj blkid:</p>
+<pre><code>linux@localhost:/tmp&gt; blkid /dev/sde1
+/dev/sdd1: UUID=&quot;24623eae-5c3c-4454-86d4-f483a360e39d&quot; TYPE=&quot;swap&quot; PARTUUID=&quot;9b990a7e-01&quot;
+
+linux@localhost:/tmp&gt; blkid /dev/sdd2
+/dev/sdd2: UUID=&quot;4a12f341-0046-4aab-aa47-d3baafed85cf&quot; SEC_TYPE=&quot;ext2&quot; TYPE=&quot;ext3&quot; PARTUUID=&quot;9b990a7e-02&quot;</code></pre>
+<p>Nyní tedy upravme soubor “/etc/config/fstab” tak, aby obsahoval nastavení uvedená v ilustraci [extroot:fstab]. Nezapomeňte použít UUID, která odpovídají Vašim oddílům.</p>
+<p>Nyní odpojte flashdisk od stroje, ve kterém jste jej připravovali, a připojte jej k routeru. Pokud vše funguje správně, měli byste v “/dev” najít uzuly zařízení.</p>
+<pre><code>root@openwrt:~&gt; ls /dev | grep sd
+sda
+sda1
+sda2</code></pre>
+<p>Oddíl extrootu je potřeba připojit a překopírovat na něj obsah adresáře “/overlay”.</p>
+<pre><code>root@openwrt:~&gt; mount /dev/sda2 /tmp/overlay
+root@openwrt:~&gt; tar -C /overlay -c . -f - | tar -C /tmp/overlay -xf -</code></pre>
+<p>Abychom měli jistotu, že je systém spuštěn z flashdisku, provedeme drobnou úpravu v souboru “/tmp/overlay/upper/etc/banner”.</p>
+<pre><code>root@openwrt:~&gt; cp /etc/banner /tmp/overlay/upper/etc/banner
+root@openwrt:~&gt; echo &quot;extroot online!&quot; &gt;&gt; /tmp/overlay/upper/etc/banner</code></pre>
+<p>A to je vše, nyní stačí router restartovat. Po restartu a následném přihlášení byste měli na konci uvítacího výpisu vidět právě zprávu “extroot online!”. Pokud ji nevidíte, někde nejspíše došlo k chybě, nejspíše není správně zadáno UUID, nebo nejsou k dispozici uzly zařízení v “/dev”. Oprava už bude na Vás.</p>
+<h2 id="poznámka-k-včasnému-použití-extrootu">Poznámka k (včasnému) použití extrootu</h2>
+<p>Jak jsem již popsal v sekci [firstboot:extroot], vytvoření extrootu jako jedné z prvních věcí (ještě dříve než nastvím heslo), může jednomu zachránit spoustu času a úsilí. Správně zabezpečený router je věcí klíčovou pro bezproblémové fungování sítě. Jste si jisit, že si (doufám že silné) heslo, které pro svůj router používáte budete pamatovat i za 5 let? Ani sebelepší systém nebude nikdy dost bezpečný, pokud jeho správce použije heslo, které si sice pamatuje, ale které je dost slabé aby ho rozlouskl puberťák se základy programování.</p>
+<h2 id="import-zálohy-externího-úložiště-z-obrazu-disku">Import zálohy externího úložiště z obrazu disku</h2>
+<p>Obnovení zálohy externího úložiště lze provést pomocí několika jednoduchých kroků.</p>
+<ol style="list-style-type: decimal">
+<li><p>Existující obraz zapište na flashdisk, který hodláte používat. Pokud používáte Windows, budete k tomu potřebovat program Win32 Disk Imager<a href="#fn15" class="footnoteRef" id="fnref15"><sup>15</sup></a>. Je možné že tento nástroj bude potřeba spustit s oprávněními správce (shift + pravé tlačítko myši). Vyberte soubor s obrazem (přípona “.img”) a cílové zařízení. Tlačítkem “Write” pak obraz zapíšete na disk. Pokud používáte Linux je celá věc mnohem jednodušší, všechny potřebné nástroje pro zápis již máte v systému. Proveďte tedy přípravu podle [extroot:umount] a pokračujte níže uvedeným příkazem.</p>
+<pre><code>linux@localhost:/tmp&gt; sudo dd if=OpenWRT-extroot.img of=/dev/sde bs=4K
+49408+0 records in
+49408+0 records out
+202375168 bytes (202 MB, 193 MiB) copied, 40.9951 s, 4.9 MB/s</code></pre></li>
+<li><p>Pro optimální využití kapacity disku je vhodné existující diskové oddíly zvětšit. Pokud má Váš disk odkládací oddíl (swap), je vhodné jej nastavit na přibližně dvojnásobek kapacity RAM routeru. Systémový oddíl můžete nechat vyplnit zbytek volného místa, či jej jen zvětšit a přidat oddíl pro sdílená data. Takto manipulovat s místem na disku můžete například pomocí programu GParted<a href="#fn16" class="footnoteRef" id="fnref16"><sup>16</sup></a>.</p></li>
+</ol>
+<p>Připojte flashdisk do routeru a přihlaste se na něj. Zkontrolujte, že se obsah souboru “/etc/config/fstab” odkazuje na správný oddíl na flashdisku. V případě, že používáte připojení disku pomocí UUID můžete identifikátor oddílu ověřit příkazem:</p>
+<pre><code>blkid /dev/sda2 # jako systemovy slouzi 2. oddil flashdisku</code></pre>
+<p>Pokud chcete namísto UUID použít cestu k zařízení, použijte klíč “device” s cestou k zařízení. Po nastavení stačí restartovat router a ověřit že je “/overlay” připojeno z flashdisku. Kompletní návod lze nalézt na wiki OpenWRT<a href="#fn17" class="footnoteRef" id="fnref17"><sup>17</sup></a>.</p>
+<pre><code>root@openwrt:/sys/class/block# grep overlay /proc/mounts
+/dev/sda2 /overlay ext2 rw,relatime 0 0
+overlayfs:/overlay / overlay rw,noatime,lowerdir=/,upperdir=/overlay/upper,workdir=/overlay/work 0 0</code></pre>
+<h1 id="další-software">Další software</h1>
+<h1 id="reset-do-továrního-nastavení">Reset do továrního nastavení</h1>
+<p>TODO: Failsafe - jak se do nej dostat, co s tím, poukázat na prevenci extrootem.</p>
+<h1 id="nastavení-specifická-pro-02">Nastavení specifická pro 02</h1>
+<h2 id="iptv">IPTV</h2>
+<p>Settopboxy pro IPTV, které O2 distribuuje přebírají živé vysílání z multicastu, program pak podpůrným protokolem (zdá se že jde o http, blíže jsem toto nezkoumal). Nahrané pořady jsou pak neseny po UDP jako unicast. Settopbox tedy očekává že je připojen do sítě O2 v režimu bridge<a href="#fn18" class="footnoteRef" id="fnref18"><sup>18</sup></a>. Tento mám ve svých nastaveních zaveden jako IPTV. Jedním virtuálním zařízením do něj připojeným je odpovídající uplink (viz následující sekce), druhým pak dedikovaná VLAN na switchi. Porty této VLAN jsou vedeny jako neznačkované.</p>
+<h2 id="vdsl">VDSL</h2>
+<p>O2 používá pro svou síť jednotné přihlašovací údaje – protokol “pppoe”, uživatel “o2”, heslo “o2”. VDSL rozhraní pak odpovídající ptm (pokud nemá router více modemů zpravidla “ptm0”), VLAN ID 848 (“ptm0.848”). Protokol získání IPv4 adresy DHCP. IPv6 pak skrze rozhraní wan6 svázané s “<span class="citation">@wan</span>”, protokol DHCPv6.</p>
+<p>Pro IPTV je pak potřeba použít bridge, do kterého je připojena vyhrazená VLAN pro multicast (vedoucí k settopboxům) a vdsl rozhraní “ptm0.835”.</p>
+<h2 id="firewall">Firewall</h2>
+<p>O2 přiděluje IPv6 adresy DHCPv6 serverem, který naslouchá na požadavky na link-local adrese, avšak odpovídá svou globální veřejnou adresou. Je tedy potřeba povolit provoz ze systémové sítě 02 “2a00:1028:1:910::1/48”, zdrojového UDP portu 547 na cílový port 546. Na stejné adrese naslouchá i DNS server, je tedy žádoucí přidat další pravidlo pro příchozí odpovědi se zdrojovým portem 53 (cílový port nespecifikován, cílová adresa libovolná). Posledním pravidlem pro tuto adresu je pak povolení příchozích ICMPv6 zpráv.</p>
+<p>Při zprovozňování routeru v síti O2 jsem narazil na jedno nepříliš milé překvapení – vestavěná pravidla “Allow-ICMPv6-Input” a “Allow-DHCPv6” nefungovala korektně – nebyla schopna dojít párování k zóně. Proto používám jejich verzi bez označené zóny (pojmenována “link-local DHCPv6” a “link-local ICMPv6”), jde ale s největší pravděpodobností o chybu někde v mém nastavení.</p>
+<p>Poslední sada pravidel se týká IPTV. Krom nastavení pravidel zóny samotné používám pro klid duše duplicitní sadu pravidel. Nastavení zóny je prosté – rozhodně nechceme, aby byly jakékoliv packety z bridge pro IPTV směrovány do wan, ani do naší vnitřní sítě či určeny modemu jako takovému – zóně tedy zakážeme jak přesměrování, tak vstup (forward a input). Zakázat lze dvěma způsoby – “deny” a “drop”. Deny generuje odpovídající hlášení o zakázaném provozu, které je zasláno protistraně. Drop paket jednoduše zahodí. Osobně doporučuji pro toto zapojení použít drop. Dodatečná duplicitní pravidla pak zakazují jakýkoliv provoz IPTV<span class="math inline">→</span>lan, IPTV<span class="math inline">→</span>zařízení a naopak povolují IPTV<span class="math inline">→</span>IPTV.</p>
+<h2 id="systém">Systém</h2>
+<p>Pro správnou funkci IPTV je potřeba zakázat IGMP snooping při startu routeru. Toho docílíte následujícím řádkem, umístěným do souboru “/etc/rc.local”:<br />
+echo &quot;0&quot; &gt; /sys/devices/virtual/net/br-IPTV/bridge/multicast_snooping</p>
+<h2 id="úryvky-konfiguračních-souborů">Úryvky konfiguračních souborů</h2>
+<h3 id="o2:frag:rclocal">Soubor</h3>
+<pre><code># Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+echo &quot;in rc.local, disabling multicast snooping for IPTV iface&quot;
+echo &quot;0&quot; &gt; /sys/devices/virtual/net/br-IPTV/bridge/multicast_snooping
+#sleep 1m ; ifdown IPTV ; ifup IPTV
+
+exit 0</code></pre>
+<h3 id="o2:frag:network">Úryvek ze souboru</h3>
+<pre><code># poradi portu na desce
+# 0 = lan2
+# 1 nezapojeno
+# 2 = lan3
+# 3 nezapojeno
+# 4 = lan4
+# 5 = lan1
+# 6 = CPU
+
+# vlan pro iptv
+config switch_vlan
+    option device &#39;switch0&#39;
+    option vlan &#39;3&#39;
+    option vid &#39;3&#39;
+    option ports &#39;4 6t&#39;
+
+config interface &#39;wan&#39;
+    option ifname &#39;ptm0.848&#39;
+    option proto &#39;pppoe&#39;
+    option username &#39;o2&#39;
+    option password &#39;o2&#39;
+    option ipv6 &#39;1&#39;
+
+config interface &#39;wan6&#39;
+    option ifname &#39;@wan&#39;
+    option proto &#39;dhcpv6&#39;
+
+config interface &#39;IPTV&#39;
+    option type &#39;bridge&#39;
+    option _orig_ifname &#39;eth0.2&#39;
+    option _orig_bridge &#39;true&#39;
+    option ifname &#39;eth0.2 ptm0.835&#39;
+    option proto &#39;static&#39;
+    option ipaddr &#39;192.168.2.1&#39;
+    option netmask &#39;255.255.255.0&#39;
+
+config vdsl &#39;dsl&#39;
+    option annex &#39;b&#39;
+    option firmware &#39;/lib/firmware/vdsl.bin&#39;
+    option tone &#39;bv&#39;
+    option xfer_mode &#39;ptm&#39;</code></pre>
+<h3 id="o2:frag:firewall:vdsl">Úryvek ze souboru – VDSL uplink</h3>
+<pre><code>### NASTAVENI SPECIFICKA PRO O2 A IPTV (O2TV)
+config zone
+    option name &#39;iptv&#39;
+    option network &#39;IPTV&#39;
+    option output &#39;ACCEPT&#39;
+    option input &#39;DROP&#39;
+    option forward &#39;DROP&#39;
+
+config rule
+    option proto &#39;udp&#39;
+    option src_port &#39;547&#39;
+    option dest_port &#39;546&#39;
+    option family &#39;ipv6&#39;
+    option target &#39;ACCEPT&#39;
+    option src &#39;wan&#39;
+    option name &#39;DHCPv6 z O2&#39;
+    option src_ip &#39;2a00:1028:1:910::1/48&#39;
+
+config rule
+    option proto &#39;udp&#39;
+    option src_port &#39;53&#39;
+    option family &#39;ipv6&#39;
+    option target &#39;ACCEPT&#39;
+    option src &#39;wan&#39;
+    option name &#39;DNS z O2&#39;
+    option src_ip &#39;2a00:1028:1:910::1/48&#39;
+    option dest &#39;*&#39;
+
+config rule
+    option target &#39;ACCEPT&#39;
+    option src &#39;wan&#39;
+    option name &#39;ICMP z O2&#39;
+    option family &#39;ipv6&#39;
+    option proto &#39;icmp&#39;
+    option src_ip &#39;2a00:1028:1:910::1/48&#39;</code></pre>
+<h3 id="o2:frag:firewall:iptv">Úryvek ze souboru – další pravidla</h3>
+<pre><code># pseudoduplicitni s Allow-ICMPv6-Input, radeji nepouzivat
+config rule
+    option family &#39;ipv6&#39;
+    option proto &#39;icmp&#39;
+    option src_ip &#39;fe80::/10&#39;
+    option dest_ip &#39;fe80::/10&#39;
+    option src &#39;*&#39;
+    option target &#39;ACCEPT&#39;
+    option name &#39;link-local ICMPv6&#39;
+
+# pseudoduplicitni s Allow-DHCPv6, radeji nepouzivat
+config rule
+    option proto &#39;udp&#39;
+    option src_port &#39;547&#39;
+    option dest_port &#39;546&#39;
+    option family &#39;ipv6&#39;
+    option target &#39;ACCEPT&#39;
+    option src &#39;*&#39;
+    option src_ip &#39;fe80::/10&#39;
+    option dest_ip &#39;fe80::/10&#39;
+    option name &#39;link-local DHCPv6&#39;
+
+# explicitni deny pro cokoliv co by z iptv chtelo
+# prolezt do wan (duplicitni proti obecnemu pravidlu)
+config rule
+    option src &#39;iptv&#39;
+    option dest &#39;lan&#39;
+    option name &#39;IPTV -&gt; lan deny&#39;
+    option target &#39;DROP&#39;
+
+config rule
+    option src &#39;iptv&#39;
+    option name &#39;IPTV -&gt; device deny&#39;
+    option target &#39;DROP&#39;
+
+# veskery provoz skrze bridge povolen
+config rule
+    option target &#39;ACCEPT&#39;
+    option src &#39;iptv&#39;
+    option dest &#39;iptv&#39;
+    option name &#39;multicast&#39;
+    option proto &#39;all&#39;</code></pre>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Viz např. <a href="http://www.root.cz/clanky/jak-se-prihlasovat-na-ssh-bez-zadavani-hesla/" class="uri">http://www.root.cz/clanky/jak-se-prihlasovat-na-ssh-bez-zadavani-hesla/</a>.<a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://www.root.cz/clanky/miliony-zarizeni-sdili-privatni-klice-k-https-a-ssh/" class="uri">http://www.root.cz/clanky/miliony-zarizeni-sdili-privatni-klice-k-https-a-ssh/</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>OpenWRT ve verzi trunk už Telnet nepodporuje.<a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="http://www.slunecnice.cz/sw/putty-cz/" class="uri">http://www.slunecnice.cz/sw/putty-cz/</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p><code>telnet 192.168.1.1</code><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p><a href="https://www.telekom.de/hilfe/downloads/firmware-speedport-w921v-1.40.000.bin" class="uri">https://www.telekom.de/hilfe/downloads/firmware-speedport-w921v-1.40.000.bin</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>Je možné, že soubor bude na webu vystaven v jiné verzi – pak je potřeba tuto stáhnout a pracovat s přejmenovanou kopií.<a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>Na Linuxu použijte příkaz <span><code>scp soubor.bin root@192.168.1.1:/tmp</code></span>.<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p><a href="http://www.slunecnice.cz/sw/putty-cz/" class="uri">http://www.slunecnice.cz/sw/putty-cz/</a><a href="#fnref9">↩</a></p></li>
+<li id="fn10"><p><code>ssh root@192.168.1.1</code><a href="#fnref10">↩</a></p></li>
+<li id="fn11"><p>OpenWRT 15.05.1 předpokládá starší, již nedostupnou, verzi firmware.<a href="#fnref11">↩</a></p></li>
+<li id="fn12"><p>Pomocí jména fyzického rozhraní “<span class="citation">@jmenorozhrani</span>” nastavujete doplnění konfigurace virtuálního rozhraní s názvem “jmenorozhrani”.<a href="#fnref12">↩</a></p></li>
+<li id="fn13"><p>Konkrétně se jedná o Lantiq[^19] XWay VRX268 <span class="citation">@500MHz</span>.<a href="#fnref13">↩</a></p></li>
+<li id="fn14"><p>Slovo zpravidla zde stojí oprávněně. Kupříkladu pro TP-Link LT-MR3220 existuje pěkný návod, jak na nevyužité GPIO piny připojit SD kartu (<a href="https://wiki.openwrt.org/toh/tp-link/tl-mr3420/deep.mmc.hack" class="uri">https://wiki.openwrt.org/toh/tp-link/tl-mr3420/deep.mmc.hack</a>).<a href="#fnref14">↩</a></p></li>
+<li id="fn15"><p><a href="https://sourceforge.net/projects/win32diskimager/" class="uri">https://sourceforge.net/projects/win32diskimager/</a><a href="#fnref15">↩</a></p></li>
+<li id="fn16"><p><a href="https://sourceforge.net/projects/gparted/" class="uri">https://sourceforge.net/projects/gparted/</a>, Dodáván i formou bootovatelného obrazu.<a href="#fnref16">↩</a></p></li>
+<li id="fn17"><p><a href="https://wiki.openwrt.org/doc/howto/extroot" class="uri">https://wiki.openwrt.org/doc/howto/extroot</a><a href="#fnref17">↩</a></p></li>
+<li id="fn18"><p>V modemu Zyxel VMG1312 B30B, na němž jsem svá nastavení zakládal, měl bridge přiřazenu IPv4 adresu 192.168.1.2. Toto odrážím i ve své konfiguraci, ačkoliv mám za to že je to zcela zbytečné.<a href="#fnref18">↩</a></p></li>
+</ol>
+</div>
+</body>
+</html>
