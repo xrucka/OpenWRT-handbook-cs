@@ -9,9 +9,7 @@ potřebovat z internetu stáhnout soubor s firmware\footnote{
 který z licenčních důvodů není možné dodávat spolu s \gls{openwrt}\footnote{
 Je možné, že soubor bude na webu vystaven v jiné verzi -- pak je potřeba tuto
 stáhnout a pracovat s přejmenovanou kopií.
-}. Soubor stáhněte, změňte číslo verze z 1.40.000 na 1.21.000 \footnote{\gls{openwrt}
-\wrtversion počítá se starší verzí firmware VDSL subsystému.}
-a nakopírujte programem WinSCP\footnote{Na Linuxu použijte příkaz
+}. Soubor stáhněte a nakopírujte programem WinSCP\footnote{Na Linuxu použijte příkaz
 {\texttt{scp soubor.bin root@192.168.1.1:/tmp}}.} na svůj router.
 Tento soubor uložte na router do adresáře \uv{/tmp}.
 
@@ -19,8 +17,18 @@ Nyní se na přihlaste na router klientem protokolu \gls{ssh} -- pod Windows mů
 použít program \uv{putty}\footnote{\url{http://www.slunecnice.cz/sw/putty-cz/}} -- viz \todo{ilustrace}\footnote{\texttt{ssh root@192.168.1.1}}.
 Uživatel pro přihlášení
 je \uv{root}, adresa hosta \uv{192.168.1.1}, heslo pak Vámi čerstvě nastavené.
-Po přihlášení spusťte příkaz \uv{vdsl\_fw\_install.sh}, který ze staženého firmware
-získá firmware pro VDSL subsystém modemu. Pro rozbalení je potřeba odsouhlasit
-licenci staženého firmware.
+Po přihlášení spusťte následující příkazů, která pozáplatuje instalační skript
+pro firmware a následně firmware nainstaluje\footnote{\gls{openwrt} 15.05.1
+předpokládá starší, již nedostupnou, verzi firmware.}.
+\begin{verbatim}
+sed -i 's#Firmware_Speedport_W921V_1.21.000.bin#firmware-speedport-w921v-1.40.000.bin#g' /sbin/vdsl_fw_install.sh
+sed -i 's#hilfe.telekom.de/dlp/eki/downloads/Speedport/Speedport%20W%20921V#www.telekom.de/hilfe/downloads#g' /sbin/vdsl_fw_install.sh
+sed -i 's#0a099d08dbf091c74d685b532cbb1390#409a69b9a4eeffd681cb2dd84d6edf6d#g' /sbin/vdsl_fw_install.sh
+sed -i 's#59dd9dc81195c6854433c691b163f757#655442e31deaa42c9c68944869361ec0#g' /sbin/vdsl_fw_install.sh
+sed -i 's#06b6ab3481b8d3eb7e8bf6131f7f6b7f#57f2d07f59e11250ce1219bad99c1eda#g' /sbin/vdsl_fw_install.sh
+ls -s /tmp/firmware-speedport-w921v-1.40.000.bin /tmp/Firmware_Speedport_W921V_1.21.000.bin#firmware-speedport-w921v-1.40.000.bin
+vdsl_fw_install.sh
+\end{verbatim}
+Pro rozbalení je potřeba odsouhlasit licenci staženého firmware.
 
 Pro nastavení VDSL připojení nyní postupujte podle návodu v sekci \ref{net:vdsl}.
